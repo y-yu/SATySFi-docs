@@ -8,35 +8,27 @@ env:
     - OCAML_VERSION=4.06
   global:
     secure: rdOEbahAv+ShjeIjrsSXj2lpUptoYpDycW0ktIZ0P875/CKbfk/AYzy7/SRdpFw3X8AWKvAX4L0Kque80EeS55MDCJiqmljAPg4UQWevhJ4Blz2/fScql4k3Ooaxm73aF99x+9IY3Eq8WAH1mky9q3fQlyY/nxeI/v64sk1gTNrEY8509zz6beidjfDR1z1lfo85kJA/uDNTV5BmXY9O1MUpMV9seI+BmK3tKZvQQiNzaleO8Dh9CK8uI421w/mKjktxgMZO0DdWhxI9KighPASI3DHWgacr4aBF127+6WDP7fu84pNn8Elm22XbNnGTDsHbhCrFYpEwuFBQP8ahQ9n05a9oQR7oNdpi0aSIju/NK6kq9YPwbbbe3Qem8wz48Hjnlx15Ckw9xUu1U61RUaLtGWWuTPlbp2LmXMx1zgDzoxcOfcw9/wC5DDX04R4kDhMoOdIebYesf5wD01TRpfmrOBvufKss8ERFAhb3Hz0XeRd6ZdjIgxe4fq5BUgosIO3sJLmfCB9QVAzUSZHZ9o3HoG0szcG6M/8NO5cM1YDKX3FxallEPaFXb5ZQNVQn64pBoxdAc7HOaMGn5AbtZbFo/ChuwPPJOAt00At5xkUe+LO3HF+T6mT5eXBtCCRhFi60Q7Vzt2cJubwLBAkk481cGO30GR1cjYhCkUw7EoU=
+cache:
+    directories:
+      - $HOME/.opam.cached
+      - $HOME/local
 before_install:
   - wget https://raw.githubusercontent.com/ocaml/ocaml-travisci-skeleton/master/.travis-ocaml.sh
   - bash -ex .travis-ocaml.sh
-  - opam install -y ppx_deriving
-  - opam install -y menhir
-  - opam install -y core_kernel.v0.10.0
-  - opam install -y ctypes
-  - opam install -y uutf
-  - opam install -y result
-  - opam install -y bitv
-  - opam install -y batteries
-  - opam install -y yojson
-  - opam install -y camlimages
+  - eval `opam config env`
+  - opam repository add satysfi-external https://github.com/gfngfn/satysfi-external-repo.git
+  - opam update
 install:
   - git clone https://github.com/gfngfn/SATySFi.git
   - cd SATySFi
-  - eval `opam config env`
-  - git submodule update --init
-  - make all
-  - make lib
-  - sudo make install
+  - opam pin add -y satysfi .
+  - opam install -y satysfi
 before_script:
-  - wget https://downloads.sourceforge.net/project/linuxlibertine/linuxlibertine/5.3.0/LinLibertineOTF_5.3.0_2012_07_02.tgz
-  - tar zxvf LinLibertineOTF_5.3.0_2012_07_02.tgz
-  - sudo mv LinLibertine_R.otf $HOME/.satysfi/dist/fonts/ArnoPro-Regular.otf
-  - wget https://oscdl.ipa.go.jp/IPAexfont/IPAexfont00301.zip
-  - unzip IPAexfont00301.zip
-  - sudo mv IPAexfont00301/ipaexm.ttf $HOME/.satysfi/dist/fonts/ipaexm.ttf
-  - sudo mv IPAexfont00301/ipaexg.ttf $HOME/.satysfi/dist/fonts/ipaexg.ttf
+  - mkdir -p "$HOME/.satysfi"
+  - cp -r ./lib-satysfi/dist "$HOME/.satysfi/dist"
+  - wget https://jaist.dl.sourceforge.net/project/junicode/junicode/junicode-1.002/junicode-1.002.zip
+  - unzip junicode-1.002.zip
+  - cp -r *.ttf "$HOME/.satysfi/dist/fonts/"
 script:
   - cd doc
   - make all
